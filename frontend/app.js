@@ -98,7 +98,7 @@ async function loadTopPhoenixes() {
             chain: 'solana'  // Always Solana
         });
         
-        const response = await fetch(`${API_BASE_URL}/api/top-phoenixes?${params}`);
+        const response = await fetch(`${API_URL}/top-phoenixes?${params}`);
         if (!response.ok) throw new Error('Failed to load tokens');
         
         let tokens = await response.json();
@@ -285,7 +285,7 @@ function showFeaturedPhoenix(token) {
 // Load Recent Alerts
 async function loadRecentAlerts() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/alerts/recent?limit=5`);
+        const response = await fetch(`${API_URL}/alerts/recent?limit=5`);
         if (!response.ok) throw new Error('Failed to load alerts');
         
         recentAlerts = await response.json();

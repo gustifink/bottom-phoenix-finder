@@ -82,7 +82,7 @@ async def root():
 async def health_check():
     return {"status": "healthy", "service": "bottom-api"}
 
-@app.get("/api/top-phoenixes", response_model=List[TokenResponse])
+@app.get("/top-phoenixes", response_model=List[TokenResponse])
 async def get_top_phoenixes(
     chain: Optional[str] = Query(None, description="Filter by blockchain (ethereum/bsc/polygon/all)"),
     min_liquidity: float = Query(5000, description="Minimum liquidity in USD"),
@@ -112,7 +112,7 @@ async def get_top_phoenixes(
         logger.error(f"Error getting top phoenixes: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/token/{address}/brs")
+@app.get("/token/{address}/brs")
 async def get_token_brs(address: str):
     """Get detailed BRS breakdown for specific token"""
     try:
@@ -142,7 +142,7 @@ async def get_token_brs(address: str):
         logger.error(f"Error getting token BRS: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/watchlist/add")
+@app.post("/watchlist/add")
 async def add_to_watchlist(watchlist_data: WatchlistAdd):
     """Add token to personal watchlist for alerts"""
     try:
@@ -166,7 +166,7 @@ async def add_to_watchlist(watchlist_data: WatchlistAdd):
         logger.error(f"Error adding to watchlist: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/alerts/recent")
+@app.get("/alerts/recent")
 async def get_recent_alerts(limit: int = Query(10, description="Number of alerts to return")):
     """Get recent phoenix alerts"""
     try:
@@ -184,7 +184,7 @@ async def get_recent_alerts(limit: int = Query(10, description="Number of alerts
         logger.error(f"Error getting recent alerts: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/token/{token_address}/analysis")
+@app.get("/token/{token_address}/analysis")
 async def get_token_analysis(token_address: str):
     """Get detailed analysis for why a token was selected as a phoenix"""
     try:
