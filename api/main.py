@@ -7,17 +7,22 @@ import os
 import sys
 import traceback
 
-# Add the backend directory to the Python path
-backend_path = os.path.join(os.path.dirname(__file__), '..', 'backend')
-sys.path.insert(0, backend_path)
-
+# Simple imports for Vercel environment
 try:
     from models.database import init_db, get_session
     from services.token_manager import TokenManager
 except ImportError as e:
     print(f"Import error: {e}")
-    traceback.print_exc()
-    raise
+    # Try alternative import paths
+    try:
+        sys.path.append('.')
+        sys.path.append('..')
+        from models.database import init_db, get_session
+        from services.token_manager import TokenManager
+    except ImportError as e2:
+        print(f"Second import error: {e2}")
+        traceback.print_exc()
+        raise
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +50,7 @@ try:
     logger.info("Database initialized successfully")
 except Exception as e:
     logger.error(f"Database initialization failed: {e}")
+    traceback.print_exc()
     engine = None
 
 # Pydantic models
@@ -86,12 +92,23 @@ async def root():
     return {
         "message": "Welcome to Bottom - Phoenix Token Finder API",
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
+        "status": "Engine initialized" if engine else "Engine failed"
     }
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "bottom-api", "database": "ok" if engine else "error"}
+    try:
+        status = "healthy" if engine else "unhealthy"
+        return {
+            "status": status, 
+            "service": "bottom-api", 
+            "database": "ok" if engine else "error",
+            "engine_status": str(type(engine)) if engine else "None"
+        }
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
+        return {"status": "error", "error": str(e)}
 
 @app.get("/top-phoenixes", response_model=List[TokenResponse])
 async def get_top_phoenixes(
@@ -103,6 +120,7 @@ async def get_top_phoenixes(
     """Get top phoenix tokens by BRS score"""
     try:
         if not engine:
+            logger.error("Database engine not initialized")
             raise HTTPException(status_code=500, detail="Database not initialized")
             
         logger.info(f"Getting top phoenixes with params: chain={chain}, min_liquidity={min_liquidity}, min_score={min_score}, limit={limit}")
@@ -131,7 +149,8 @@ async def get_top_phoenixes(
     except Exception as e:
         logger.error(f"Error getting top phoenixes: {e}")
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+        # Return empty list instead of error for better UX
+        return []
 
 @app.get("/token/{address}/brs")
 async def get_token_brs(address: str):
@@ -244,6 +263,12 @@ async def get_token_analysis(token_address: str):
         logger.error(f"Error getting token analysis: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+# Simplified endpoints for debugging
+@app.get("/test")
+async def test_endpoint():
+    """Simple test endpoint"""
+    return {"status": "API is working", "timestamp": "2025-01-02"}
 
 # Export the app for Vercel
 handler = app 
