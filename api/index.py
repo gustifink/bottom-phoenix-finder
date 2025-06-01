@@ -1,37 +1,57 @@
+from urllib.parse import parse_qs
 import json
-import requests
+import urllib.request
+import urllib.error
 from datetime import datetime
+import time
 
-def handler(event, context):
-    """Simple serverless function that calls Dexscreener API"""
+def handler(request):
+    """Vercel serverless function handler"""
     
-    # Enable CORS
+    # Handle CORS
     headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
     
-    path = event.get('path', '')
+    # Handle OPTIONS request
+    if request.get('method') == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': ''
+        }
     
-    if path == '/api/top-phoenixes':
+    # Get the URL path
+    url = request.get('url', '')
+    path = request.get('path', url)
+    
+    print(f"Request path: {path}")
+    
+    if '/api/top-phoenixes' in path:
         try:
-            # Call Dexscreener API directly - same as working local version
-            search_terms = ["BONK", "MEW", "POPCAT", "WIF", "BOME", "SLERF"]
+            # Get real Solana phoenix tokens from Dexscreener - same as local backend
             phoenixes = []
+            
+            # Search terms that work in local backend
+            search_terms = ["BOME", "SLERF", "POPCAT", "MEW", "BONK", "GIGA", "MASK", "MYRO"]
             
             for term in search_terms:
                 try:
-                    response = requests.get(f"https://api.dexscreener.com/latest/dex/search?q={term}")
-                    if response.status_code == 200:
-                        data = response.json()
+                    # Call Dexscreener API - exactly like local backend
+                    url = f"https://api.dexscreener.com/latest/dex/search?q={term}"
+                    
+                    with urllib.request.urlopen(url, timeout=10) as response:
+                        data = json.loads(response.read().decode())
                         pairs = data.get("pairs", [])
                         
                         for pair in pairs[:2]:  # Top 2 per term
                             if pair.get("chainId") == "solana" and pair.get("baseToken"):
                                 token = pair["baseToken"]
                                 
+                                # Create phoenix token data - same format as local backend
                                 phoenix = {
                                     "address": token.get("address", ""),
                                     "symbol": token.get("symbol", ""),
@@ -44,18 +64,18 @@ def handler(event, context):
                                     "market_cap": float(pair.get("marketCap", 0)),
                                     "fdv": float(pair.get("fdv", 0)),
                                     "price_change_24h": float(pair.get("priceChange", {}).get("h24", 0)),
-                                    "brs_score": min(95.0, 70.0 + (float(pair.get("volume", {}).get("h24", 0)) / 1000000 * 5)),
+                                    "brs_score": min(98.0, 80.0 + (float(pair.get("volume", {}).get("h24", 0)) / 1000000 * 3)),
                                     "category": "Phoenix Rising",
-                                    "description": f"Solana token showing recovery potential",
-                                    "holder_resilience_score": 15.0,
-                                    "volume_floor_score": 12.0,
-                                    "price_recovery_score": 16.0,
-                                    "distribution_health_score": 11.0,
-                                    "revival_momentum_score": 13.0,
-                                    "smart_accumulation_score": 10.0,
-                                    "buy_sell_ratio": 1.25,
-                                    "volume_trend": "increasing",
-                                    "price_trend": "recovering",
+                                    "description": "Strong buy signal - high recovery potential",
+                                    "holder_resilience_score": 20.0,
+                                    "volume_floor_score": min(20.0, float(pair.get("volume", {}).get("h24", 0)) / 50000),
+                                    "price_recovery_score": 18.0,
+                                    "distribution_health_score": 10.0,
+                                    "revival_momentum_score": 15.0,
+                                    "smart_accumulation_score": 15.0,
+                                    "buy_sell_ratio": 1.25 + (float(pair.get("priceChange", {}).get("h24", 0)) / 100),
+                                    "volume_trend": "up" if float(pair.get("priceChange", {}).get("h24", 0)) > 0 else "down",
+                                    "price_trend": "up" if float(pair.get("priceChange", {}).get("h24", 0)) > 0 else "down",
                                     "last_updated": datetime.now().isoformat(),
                                     "first_seen_date": "2024-01-15T10:30:00",
                                     "token_age_days": 300
@@ -69,8 +89,10 @@ def handler(event, context):
                     print(f"Error with {term}: {e}")
                     continue
             
-            # Sort by BRS score
+            # Sort by BRS score - same as local backend
             phoenixes.sort(key=lambda x: x["brs_score"], reverse=True)
+            
+            print(f"Returning {len(phoenixes)} phoenixes")
             
             return {
                 'statusCode': 200,
@@ -79,39 +101,42 @@ def handler(event, context):
             }
             
         except Exception as e:
+            print(f"Error in top-phoenixes: {e}")
             return {
                 'statusCode': 500,
                 'headers': headers,
                 'body': json.dumps({"error": str(e)})
             }
     
-    elif path == '/api/alerts/recent':
+    elif '/api/alerts/recent' in path:
+        # Return sample alerts - same as local backend
         alerts = [
             {
                 "id": 1,
-                "token_address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                "token_address": "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82",
                 "alert_type": "phoenix_rising",
-                "message": "🚀 Token showing phoenix recovery potential",
-                "score_at_alert": 78.5,
+                "message": "🚀 BOME showing phoenix recovery potential",
+                "score_at_alert": 98.0,
                 "timestamp": datetime.now().isoformat()
             }
         ]
+        
         return {
             'statusCode': 200,
             'headers': headers,
             'body': json.dumps(alerts)
         }
     
-    elif path == '/api/test':
+    elif '/api/test' in path or path.endswith('/api/'):
         return {
             'statusCode': 200,
             'headers': headers,
-            'body': json.dumps({"status": "working", "message": "Simple Dexscreener API working!"})
+            'body': json.dumps({"status": "working", "message": "Dexscreener API working!", "timestamp": datetime.now().isoformat()})
         }
     
     else:
         return {
             'statusCode': 404,
             'headers': headers,
-            'body': json.dumps({"error": "Not found"})
+            'body': json.dumps({"error": "Not found", "path": path})
         } 
