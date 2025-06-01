@@ -505,7 +505,7 @@ function formatComponentName(key) {
 // Add to Watchlist
 async function addToWatchlist(address) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/watchlist/add`, {
+        const response = await fetch(`${API_URL}/watchlist/add`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

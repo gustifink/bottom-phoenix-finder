@@ -5,13 +5,19 @@ from pydantic import BaseModel
 import logging
 import os
 import sys
+import traceback
 
 # Add the backend directory to the Python path
 backend_path = os.path.join(os.path.dirname(__file__), '..', 'backend')
 sys.path.insert(0, backend_path)
 
-from models.database import init_db, get_session
-from services.token_manager import TokenManager
+try:
+    from models.database import init_db, get_session
+    from services.token_manager import TokenManager
+except ImportError as e:
+    print(f"Import error: {e}")
+    traceback.print_exc()
+    raise
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +40,12 @@ app.add_middleware(
 )
 
 # Initialize database with in-memory SQLite for serverless
-engine = init_db("sqlite:///:memory:")
+try:
+    engine = init_db("sqlite:///:memory:")
+    logger.info("Database initialized successfully")
+except Exception as e:
+    logger.error(f"Database initialization failed: {e}")
+    engine = None
 
 # Pydantic models
 class WatchlistAdd(BaseModel):
@@ -80,7 +91,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "bottom-api"}
+    return {"status": "healthy", "service": "bottom-api", "database": "ok" if engine else "error"}
 
 @app.get("/top-phoenixes", response_model=List[TokenResponse])
 async def get_top_phoenixes(
@@ -91,17 +102,26 @@ async def get_top_phoenixes(
 ):
     """Get top phoenix tokens by BRS score"""
     try:
+        if not engine:
+            raise HTTPException(status_code=500, detail="Database not initialized")
+            
+        logger.info(f"Getting top phoenixes with params: chain={chain}, min_liquidity={min_liquidity}, min_score={min_score}, limit={limit}")
+        
         session = get_session(engine)
         token_manager = TokenManager(session)
         
         # For serverless, we'll discover tokens on-demand
+        logger.info("Starting phoenix discovery...")
         await token_manager.discover_new_phoenixes(["solana"])
+        logger.info("Phoenix discovery completed")
         
         phoenixes = await token_manager.get_top_phoenixes(
             limit=limit,
             min_score=min_score,
-            chain=chain
+            chain=chain or "solana"  # Default to solana
         )
+        
+        logger.info(f"Found {len(phoenixes)} phoenix tokens")
         
         session.close()
         await token_manager.cleanup()
@@ -110,12 +130,16 @@ async def get_top_phoenixes(
         
     except Exception as e:
         logger.error(f"Error getting top phoenixes: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @app.get("/token/{address}/brs")
 async def get_token_brs(address: str):
     """Get detailed BRS breakdown for specific token"""
     try:
+        if not engine:
+            raise HTTPException(status_code=500, detail="Database not initialized")
+            
         session = get_session(engine)
         token_manager = TokenManager(session)
         
@@ -140,12 +164,16 @@ async def get_token_brs(address: str):
         raise
     except Exception as e:
         logger.error(f"Error getting token BRS: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/watchlist/add")
 async def add_to_watchlist(watchlist_data: WatchlistAdd):
     """Add token to personal watchlist for alerts"""
     try:
+        if not engine:
+            raise HTTPException(status_code=500, detail="Database not initialized")
+            
         session = get_session(engine)
         token_manager = TokenManager(session)
         
@@ -164,12 +192,17 @@ async def add_to_watchlist(watchlist_data: WatchlistAdd):
             
     except Exception as e:
         logger.error(f"Error adding to watchlist: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/alerts/recent")
 async def get_recent_alerts(limit: int = Query(10, description="Number of alerts to return")):
     """Get recent phoenix alerts"""
     try:
+        if not engine:
+            # Return empty alerts if database not available
+            return []
+            
         session = get_session(engine)
         token_manager = TokenManager(session)
         
@@ -182,12 +215,16 @@ async def get_recent_alerts(limit: int = Query(10, description="Number of alerts
         
     except Exception as e:
         logger.error(f"Error getting recent alerts: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return empty list instead of error for alerts
+        return []
 
 @app.get("/token/{token_address}/analysis")
 async def get_token_analysis(token_address: str):
     """Get detailed analysis for why a token was selected as a phoenix"""
     try:
+        if not engine:
+            raise HTTPException(status_code=500, detail="Database not initialized")
+            
         session = get_session(engine)
         token_manager = TokenManager(session)
         
@@ -205,6 +242,7 @@ async def get_token_analysis(token_address: str):
         raise
     except Exception as e:
         logger.error(f"Error getting token analysis: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 # Export the app for Vercel
