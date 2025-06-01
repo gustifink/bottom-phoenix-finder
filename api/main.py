@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import traceback
+import datetime
 
 # Simple imports for Vercel environment
 try:
@@ -86,6 +87,96 @@ class TokenResponse(BaseModel):
     first_seen_date: Optional[str]
     token_age_days: Optional[int]
 
+# Mock data for testing
+def get_mock_phoenixes():
+    """Return mock phoenix token data for testing"""
+    return [
+        {
+            "address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+            "symbol": "Bonk",
+            "name": "Bonk",
+            "chain": "solana",
+            "current_price": 0.000025,
+            "crash_percentage": 85.5,
+            "liquidity_usd": 2500000,
+            "volume_24h": 15000000,
+            "market_cap": 1650000000,
+            "fdv": 1650000000,
+            "price_change_24h": 3.2,
+            "brs_score": 78.5,
+            "category": "Showing Life",
+            "description": "High-volume memecoin showing phoenix recovery potential",
+            "holder_resilience_score": 15.5,
+            "volume_floor_score": 12.0,
+            "price_recovery_score": 16.8,
+            "distribution_health_score": 11.2,
+            "revival_momentum_score": 13.0,
+            "smart_accumulation_score": 10.0,
+            "buy_sell_ratio": 1.35,
+            "volume_trend": "increasing",
+            "price_trend": "recovering",
+            "last_updated": datetime.datetime.utcnow().isoformat(),
+            "first_seen_date": "2024-01-15T10:30:00",
+            "token_age_days": 352
+        },
+        {
+            "address": "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5",
+            "symbol": "MEW",
+            "name": "cat in a dogs world",
+            "chain": "solana",
+            "current_price": 0.0089,
+            "crash_percentage": 72.1,
+            "liquidity_usd": 890000,
+            "volume_24h": 5200000,
+            "market_cap": 295000000,
+            "fdv": 295000000,
+            "price_change_24h": 1.8,
+            "brs_score": 72.3,
+            "category": "Showing Life",
+            "description": "Cat-themed token with strong community and recovery momentum",
+            "holder_resilience_score": 14.2,
+            "volume_floor_score": 10.8,
+            "price_recovery_score": 15.1,
+            "distribution_health_score": 12.5,
+            "revival_momentum_score": 11.7,
+            "smart_accumulation_score": 8.0,
+            "buy_sell_ratio": 1.28,
+            "volume_trend": "stable",
+            "price_trend": "sideways",
+            "last_updated": datetime.datetime.utcnow().isoformat(),
+            "first_seen_date": "2024-03-20T14:15:00",
+            "token_age_days": 288
+        },
+        {
+            "address": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+            "symbol": "POPCAT",
+            "name": "Popcat",
+            "chain": "solana",
+            "current_price": 0.385,
+            "crash_percentage": 68.9,
+            "liquidity_usd": 1200000,
+            "volume_24h": 8500000,
+            "market_cap": 373000000,
+            "fdv": 373000000,
+            "price_change_24h": 4.1,
+            "brs_score": 75.8,
+            "category": "Showing Life",
+            "description": "Viral meme token with strong technical recovery signals",
+            "holder_resilience_score": 16.0,
+            "volume_floor_score": 11.5,
+            "price_recovery_score": 17.2,
+            "distribution_health_score": 10.8,
+            "revival_momentum_score": 12.3,
+            "smart_accumulation_score": 8.0,
+            "buy_sell_ratio": 1.42,
+            "volume_trend": "increasing",
+            "price_trend": "bullish",
+            "last_updated": datetime.datetime.utcnow().isoformat(),
+            "first_seen_date": "2024-02-10T09:45:00",
+            "token_age_days": 326
+        }
+    ]
+
 # API Endpoints
 @app.get("/")
 async def root():
@@ -93,63 +184,47 @@ async def root():
         "message": "Welcome to Bottom - Phoenix Token Finder API",
         "docs": "/docs",
         "health": "/health",
-        "status": "Engine initialized" if engine else "Engine failed"
+        "status": "Mock API - Working"
     }
 
 @app.get("/health")
 async def health_check():
-    try:
-        status = "healthy" if engine else "unhealthy"
-        return {
-            "status": status, 
-            "service": "bottom-api", 
-            "database": "ok" if engine else "error",
-            "engine_status": str(type(engine)) if engine else "None"
-        }
-    except Exception as e:
-        logger.error(f"Health check error: {e}")
-        return {"status": "error", "error": str(e)}
+    return {
+        "status": "healthy", 
+        "service": "bottom-api", 
+        "database": "mock",
+        "timestamp": datetime.datetime.utcnow().isoformat()
+    }
 
 @app.get("/top-phoenixes", response_model=List[TokenResponse])
 async def get_top_phoenixes(
-    chain: Optional[str] = Query(None, description="Filter by blockchain (ethereum/bsc/polygon/all)"),
+    chain: Optional[str] = Query(None, description="Filter by blockchain"),
     min_liquidity: float = Query(5000, description="Minimum liquidity in USD"),
     min_score: float = Query(0, description="Minimum BRS score"),
     limit: int = Query(20, description="Number of results to return")
 ):
-    """Get top phoenix tokens by BRS score"""
+    """Get top phoenix tokens by BRS score - Mock Data"""
     try:
-        if not engine:
-            logger.error("Database engine not initialized")
-            raise HTTPException(status_code=500, detail="Database not initialized")
-            
-        logger.info(f"Getting top phoenixes with params: chain={chain}, min_liquidity={min_liquidity}, min_score={min_score}, limit={limit}")
+        logger.info(f"Getting mock phoenixes with params: limit={limit}, min_score={min_score}")
         
-        session = get_session(engine)
-        token_manager = TokenManager(session)
+        # Get mock data
+        phoenixes = get_mock_phoenixes()
         
-        # For serverless, we'll discover tokens on-demand
-        logger.info("Starting phoenix discovery...")
-        await token_manager.discover_new_phoenixes(["solana"])
-        logger.info("Phoenix discovery completed")
+        # Apply filters
+        filtered_phoenixes = [
+            phoenix for phoenix in phoenixes 
+            if phoenix["brs_score"] >= min_score 
+            and phoenix["liquidity_usd"] >= min_liquidity
+        ]
         
-        phoenixes = await token_manager.get_top_phoenixes(
-            limit=limit,
-            min_score=min_score,
-            chain=chain or "solana"  # Default to solana
-        )
+        # Limit results
+        result = filtered_phoenixes[:limit]
         
-        logger.info(f"Found {len(phoenixes)} phoenix tokens")
-        
-        session.close()
-        await token_manager.cleanup()
-        
-        return phoenixes
+        logger.info(f"Returning {len(result)} mock phoenix tokens")
+        return result
         
     except Exception as e:
-        logger.error(f"Error getting top phoenixes: {e}")
-        traceback.print_exc()
-        # Return empty list instead of error for better UX
+        logger.error(f"Error getting mock phoenixes: {e}")
         return []
 
 @app.get("/token/{address}/brs")
@@ -216,25 +291,31 @@ async def add_to_watchlist(watchlist_data: WatchlistAdd):
 
 @app.get("/alerts/recent")
 async def get_recent_alerts(limit: int = Query(10, description="Number of alerts to return")):
-    """Get recent phoenix alerts"""
+    """Get recent phoenix alerts - Mock Data"""
     try:
-        if not engine:
-            # Return empty alerts if database not available
-            return []
-            
-        session = get_session(engine)
-        token_manager = TokenManager(session)
+        alerts = [
+            {
+                "id": 1,
+                "token_address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                "alert_type": "phoenix_rising",
+                "message": "🚀 Bonk - Showing Life: High-volume memecoin showing phoenix recovery potential. BRS Score: 78.5",
+                "score_at_alert": 78.5,
+                "timestamp": (datetime.datetime.utcnow() - datetime.timedelta(hours=2)).isoformat()
+            },
+            {
+                "id": 2,
+                "token_address": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+                "alert_type": "showing_life",
+                "message": "🔥 POPCAT - Showing Life: Viral meme token with strong technical recovery signals. BRS Score: 75.8",
+                "score_at_alert": 75.8,
+                "timestamp": (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).isoformat()
+            }
+        ]
         
-        alerts = await token_manager.get_recent_alerts(limit=limit)
-        
-        session.close()
-        await token_manager.cleanup()
-        
-        return alerts
+        return alerts[:limit]
         
     except Exception as e:
-        logger.error(f"Error getting recent alerts: {e}")
-        # Return empty list instead of error for alerts
+        logger.error(f"Error getting mock alerts: {e}")
         return []
 
 @app.get("/token/{token_address}/analysis")
@@ -268,7 +349,11 @@ async def get_token_analysis(token_address: str):
 @app.get("/test")
 async def test_endpoint():
     """Simple test endpoint"""
-    return {"status": "API is working", "timestamp": "2025-01-02"}
+    return {
+        "status": "API is working", 
+        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "message": "Mock API responding successfully"
+    }
 
 # Export the app for Vercel
 handler = app 
