@@ -1,4 +1,4 @@
-// API Configuration - Use relative URLs for production
+// API Configuration - Use Vercel production API
 const API_URL = '/api';
 const API_BASE_URL = '';
 const WS_URL = location.protocol === 'https:' ? 'wss://' + location.host + '/ws/updates' : 'ws://' + location.host + '/ws/updates';

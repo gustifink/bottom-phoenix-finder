@@ -23,7 +23,7 @@ echo "🚀 Starting backend server..."
 cd backend
 source venv/bin/activate
 export PYTHONPATH=$(pwd):$PYTHONPATH
-python3 app/main.py &
+python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
 BACKEND_PID=$!
 cd ..
 

@@ -1,14 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "api/index.py": {
-      "runtime": "@vercel/python"
+    "api/*.js": {
+      "runtime": "nodejs18.x"
     }
   },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.py"
+      "dest": "/api/$1"
     },
     {
       "src": "/",
