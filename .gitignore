@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.log
+
+# Virtual Environment
+backend/venv/
+backend/env/
+backend/ENV/
+venv/
+env/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backend/bottom.db
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Node (if using for frontend tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production
+*.pid
+*.seed
+*.pid.lock
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Vercel
+.vercel
+.vercel/*
+.now
+.next
+
+# Local development
+backend/*.log
+backend/*.json
+backend/response.json
+backend/analysis_response.json
+backend/bome_analysis.json
+backend/token_analysis_report.json 
