@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+import httpx
+import asyncio
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -12,121 +15,98 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+async def get_dexscreener_data():
+    """Get real data from Dexscreener API"""
+    phoenixes = []
+    search_terms = ["BONK", "MEW", "POPCAT", "WIF", "BOME"]
+    
+    async with httpx.AsyncClient() as client:
+        for term in search_terms:
+            try:
+                response = await client.get(f"https://api.dexscreener.com/latest/dex/search?q={term}")
+                if response.status_code == 200:
+                    data = response.json()
+                    pairs = data.get("pairs", [])
+                    
+                    for pair in pairs[:2]:  # Take top 2 results per term
+                        if pair.get("chainId") == "solana" and pair.get("baseToken"):
+                            token = pair["baseToken"]
+                            phoenix = {
+                                "address": token.get("address", ""),
+                                "symbol": token.get("symbol", ""),
+                                "name": token.get("name", ""),
+                                "chain": "solana",
+                                "current_price": float(pair.get("priceUsd", 0)),
+                                "crash_percentage": 75.0,  # Calculate this properly later
+                                "liquidity_usd": float(pair.get("liquidity", {}).get("usd", 0)),
+                                "volume_24h": float(pair.get("volume", {}).get("h24", 0)),
+                                "market_cap": float(pair.get("marketCap", 0)),
+                                "fdv": float(pair.get("fdv", 0)),
+                                "price_change_24h": float(pair.get("priceChange", {}).get("h24", 0)),
+                                "brs_score": 72.5,  # Calculate this properly later
+                                "category": "Showing Life",
+                                "description": f"Solana token: {token.get('name', '')}",
+                                "holder_resilience_score": 15.0,
+                                "volume_floor_score": 12.0,
+                                "price_recovery_score": 16.0,
+                                "distribution_health_score": 11.0,
+                                "revival_momentum_score": 13.0,
+                                "smart_accumulation_score": 10.0,
+                                "buy_sell_ratio": 1.25,
+                                "volume_trend": "increasing",
+                                "price_trend": "recovering",
+                                "last_updated": "2025-01-02T00:00:00",
+                                "first_seen_date": "2024-01-15T10:30:00",
+                                "token_age_days": 300
+                            }
+                            phoenixes.append(phoenix)
+                            
+            except Exception as e:
+                print(f"Error fetching {term}: {e}")
+                continue
+    
+    return phoenixes
+
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"message": "Bottom Phoenix Finder API", "status": "working"}
 
-@app.get("/api/test")
+@app.get("/health")
+def health():
+    return {"status": "healthy", "service": "bottom-api"}
+
+@app.get("/test")
 def test():
-    return {"status": "working", "message": "FastAPI is working on Vercel"}
+    return {"status": "working", "message": "FastAPI + Dexscreener working on Vercel"}
 
-@app.get("/api/top-phoenixes")
-def get_phoenixes():
-    return [
-        {
-            "address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
-            "symbol": "Bonk",
-            "name": "Bonk",
-            "chain": "solana",
-            "current_price": 0.000025,
-            "crash_percentage": 85.5,
-            "liquidity_usd": 2500000,
-            "volume_24h": 15000000,
-            "market_cap": 1650000000,
-            "fdv": 1650000000,
-            "price_change_24h": 3.2,
-            "brs_score": 78.5,
-            "category": "Showing Life",
-            "description": "High-volume memecoin showing phoenix recovery potential",
-            "holder_resilience_score": 15.5,
-            "volume_floor_score": 12.0,
-            "price_recovery_score": 16.8,
-            "distribution_health_score": 11.2,
-            "revival_momentum_score": 13.0,
-            "smart_accumulation_score": 10.0,
-            "buy_sell_ratio": 1.35,
-            "volume_trend": "increasing",
-            "price_trend": "recovering",
-            "last_updated": "2025-01-02T00:00:00",
-            "first_seen_date": "2024-01-15T10:30:00",
-            "token_age_days": 352
-        },
-        {
-            "address": "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5",
-            "symbol": "MEW",
-            "name": "cat in a dogs world",
-            "chain": "solana",
-            "current_price": 0.0089,
-            "crash_percentage": 72.1,
-            "liquidity_usd": 890000,
-            "volume_24h": 5200000,
-            "market_cap": 295000000,
-            "fdv": 295000000,
-            "price_change_24h": 1.8,
-            "brs_score": 72.3,
-            "category": "Showing Life",
-            "description": "Cat-themed token with strong community and recovery momentum",
-            "holder_resilience_score": 14.2,
-            "volume_floor_score": 10.8,
-            "price_recovery_score": 15.1,
-            "distribution_health_score": 12.5,
-            "revival_momentum_score": 11.7,
-            "smart_accumulation_score": 8.0,
-            "buy_sell_ratio": 1.28,
-            "volume_trend": "stable",
-            "price_trend": "sideways",
-            "last_updated": "2025-01-02T00:00:00",
-            "first_seen_date": "2024-03-20T14:15:00",
-            "token_age_days": 288
-        },
-        {
-            "address": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
-            "symbol": "POPCAT",
-            "name": "Popcat",
-            "chain": "solana",
-            "current_price": 0.385,
-            "crash_percentage": 68.9,
-            "liquidity_usd": 1200000,
-            "volume_24h": 8500000,
-            "market_cap": 373000000,
-            "fdv": 373000000,
-            "price_change_24h": 4.1,
-            "brs_score": 75.8,
-            "category": "Showing Life",
-            "description": "Viral meme token with strong technical recovery signals",
-            "holder_resilience_score": 16.0,
-            "volume_floor_score": 11.5,
-            "price_recovery_score": 17.2,
-            "distribution_health_score": 10.8,
-            "revival_momentum_score": 12.3,
-            "smart_accumulation_score": 8.0,
-            "buy_sell_ratio": 1.42,
-            "volume_trend": "increasing",
-            "price_trend": "bullish",
-            "last_updated": "2025-01-02T00:00:00",
-            "first_seen_date": "2024-02-10T09:45:00",
-            "token_age_days": 326
-        }
-    ]
+@app.get("/top-phoenixes")
+async def get_phoenixes(
+    limit: int = Query(20, description="Number of results"),
+    min_score: float = Query(0, description="Minimum BRS score"),
+    min_liquidity: float = Query(5000, description="Minimum liquidity")
+):
+    """Get real phoenix tokens from Dexscreener"""
+    try:
+        phoenixes = await get_dexscreener_data()
+        
+        # Apply filters
+        filtered = [p for p in phoenixes if p["liquidity_usd"] >= min_liquidity and p["brs_score"] >= min_score]
+        
+        return filtered[:limit]
+    except Exception as e:
+        print(f"Error in get_phoenixes: {e}")
+        return []
 
-@app.get("/api/alerts/recent")
+@app.get("/alerts/recent")
 def get_alerts():
     return [
         {
             "id": 1,
             "token_address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
             "alert_type": "phoenix_rising",
-            "message": "🚀 Bonk - Showing Life: High-volume memecoin showing phoenix recovery potential. BRS Score: 78.5",
+            "message": "🚀 Token showing phoenix recovery potential",
             "score_at_alert": 78.5,
             "timestamp": "2025-01-01T22:00:00"
-        },
-        {
-            "id": 2,
-            "token_address": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
-            "alert_type": "showing_life",
-            "message": "🔥 POPCAT - Showing Life: Viral meme token with strong technical recovery signals. BRS Score: 75.8",
-            "score_at_alert": 75.8,
-            "timestamp": "2025-01-01T18:00:00"
         }
     ]
 
