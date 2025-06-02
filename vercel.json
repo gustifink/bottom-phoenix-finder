@@ -1,22 +1,31 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "@vercel/node@18"
+  "builds": [
+    {
+      "src": "api/main.py",
+      "use": "@vercel/python"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/api/main.py"
+    },
+    {
+      "src": "/frontend/(.*)",
+      "dest": "/frontend/$1"
     },
     {
       "src": "/",
       "dest": "/frontend/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
     }
-  ]
+  ],
+  "env": {
+    "PYTHONPATH": "/var/task"
+  },
+  "functions": {
+    "api/main.py": {
+      "runtime": "python3.9"
+    }
+  }
 } 

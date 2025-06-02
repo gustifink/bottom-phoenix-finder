@@ -1,0 +1,206 @@
+{
+    "token_info": {
+        "symbol": "BOME",
+        "name": "BOOK OF MEME",
+        "address": "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82",
+        "chain": "solana",
+        "token_age_days": 444,
+        "first_seen": "2024-03-14T08:26:48",
+        "dexscreener_url": "https://dexscreener.com/solana/ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82"
+    },
+    "market_metrics": {
+        "current_price": 0.001864,
+        "market_cap": 128547859.0,
+        "liquidity_usd": 25475804.26,
+        "volume_24h": 1397001.29,
+        "liquidity_to_mcap_ratio": 19.818147465217606
+    },
+    "phoenix_indicators": {
+        "crash_from_ath": 0.48051254671650345,
+        "price_change_24h": 0.82,
+        "price_change_6h": 1.85,
+        "price_change_1h": 0.43,
+        "buy_sell_ratio": 1.22,
+        "buys_24h": 1773,
+        "sells_24h": 1450
+    },
+    "volume_history": [
+        {
+            "date": "2025-05-02",
+            "volume": 1019075.05
+        },
+        {
+            "date": "2025-05-03",
+            "volume": 1260562.09
+        },
+        {
+            "date": "2025-05-04",
+            "volume": 1777900.83
+        },
+        {
+            "date": "2025-05-05",
+            "volume": 754168.37
+        },
+        {
+            "date": "2025-05-06",
+            "volume": 771989.65
+        },
+        {
+            "date": "2025-05-07",
+            "volume": 874975.87
+        },
+        {
+            "date": "2025-05-08",
+            "volume": 1702710.88
+        },
+        {
+            "date": "2025-05-09",
+            "volume": 1405563.34
+        },
+        {
+            "date": "2025-05-10",
+            "volume": 1015372.81
+        },
+        {
+            "date": "2025-05-11",
+            "volume": 1382895.71
+        },
+        {
+            "date": "2025-05-12",
+            "volume": 1009007.6
+        },
+        {
+            "date": "2025-05-13",
+            "volume": 1295148.6
+        },
+        {
+            "date": "2025-05-14",
+            "volume": 1388803.39
+        },
+        {
+            "date": "2025-05-15",
+            "volume": 1018640.73
+        },
+        {
+            "date": "2025-05-16",
+            "volume": 839124.75
+        },
+        {
+            "date": "2025-05-17",
+            "volume": 1874244.52
+        },
+        {
+            "date": "2025-05-18",
+            "volume": 1966527.79
+        },
+        {
+            "date": "2025-05-19",
+            "volume": 1442444.7
+        },
+        {
+            "date": "2025-05-20",
+            "volume": 1951602.2
+        },
+        {
+            "date": "2025-05-21",
+            "volume": 1380344.91
+        },
+        {
+            "date": "2025-05-22",
+            "volume": 1365077.06
+        },
+        {
+            "date": "2025-05-23",
+            "volume": 2116180.53
+        },
+        {
+            "date": "2025-05-24",
+            "volume": 1164597.47
+        },
+        {
+            "date": "2025-05-25",
+            "volume": 1118932.31
+        },
+        {
+            "date": "2025-05-26",
+            "volume": 1782744.18
+        },
+        {
+            "date": "2025-05-27",
+            "volume": 903279.72
+        },
+        {
+            "date": "2025-05-28",
+            "volume": 1313397.21
+        },
+        {
+            "date": "2025-05-29",
+            "volume": 1940213.11
+        },
+        {
+            "date": "2025-05-30",
+            "volume": 1888443.66
+        },
+        {
+            "date": "2025-05-31",
+            "volume": 1910549.63
+        }
+    ],
+    "large_transactions": {
+        "total_count": 0,
+        "total_volume": 0,
+        "transactions": []
+    },
+    "brs_analysis": {
+        "total_score": 96.0,
+        "category": "Phoenix Rising",
+        "interpretation": "Strong buy signal - high recovery potential",
+        "score_breakdown": {
+            "holder_resilience": {
+                "score": 20.0,
+                "max_score": 20,
+                "percentage": 100.0,
+                "explanation": "Excellent holder confidence with buy/sell ratio of 1.22. Strong accumulation happening - more buyers than sellers by over 20%."
+            },
+            "volume_floor": {
+                "score": 20.0,
+                "max_score": 20,
+                "percentage": 100.0,
+                "explanation": "Exceptional volume of $1,397,001 indicates very high market interest and liquidity for exits."
+            },
+            "price_recovery": {
+                "score": 18.0,
+                "max_score": 20,
+                "percentage": 90.0,
+                "explanation": "Positive momentum with 0.8% gain in 24h. Buyers stepping in at these levels."
+            },
+            "distribution_health": {
+                "score": 10.0,
+                "max_score": 10,
+                "percentage": 100.0,
+                "explanation": "Excellent liquidity ratio of 19.8%. Deep liquidity relative to market cap reduces manipulation risk."
+            },
+            "revival_momentum": {
+                "score": 15.0,
+                "max_score": 15,
+                "percentage": 100.0,
+                "explanation": "Strong revival momentum with $1,397,001 volume and 1.9% recent gain. Classic phoenix pattern emerging."
+            },
+            "smart_accumulation": {
+                "score": 13.0,
+                "max_score": 15,
+                "percentage": 86.66666666666667,
+                "explanation": "Strong accumulation: 1773 buys vs 1450 sells. Buyers dominating at these levels."
+            }
+        }
+    },
+    "selection_reasons": [
+        "\u2713 24h volume of $1,397,001 exceeds minimum requirement",
+        "\u2713 Market cap of $128,547,859 meets minimum size requirement",
+        "\u2713 Buy/sell ratio of 1.22 shows accumulation",
+        "\u2713 Recent price recovery of 1.9% in 6h",
+        "\u2713 BRS score of 96.0 indicates strong phoenix potential"
+    ],
+    "risk_factors": [],
+    "timestamp": "2025-06-01T20:14:32.219541"
+}

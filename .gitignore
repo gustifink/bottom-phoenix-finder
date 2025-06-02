@@ -78,18 +78,4 @@ Thumbs.db
 
 # Temporary files
 *.tmp
-*.temp
-
-# Vercel
-.vercel
-.vercel/*
-.now
-.next
-
-# Local development
-backend/*.log
-backend/*.json
-backend/response.json
-backend/analysis_response.json
-backend/bome_analysis.json
-backend/token_analysis_report.json 
+*.temp 

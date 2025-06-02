@@ -1,0 +1,101 @@
+{
+  "token_identity": {
+    "symbol": "OKCC",
+    "name": "Official King Charles Coin",
+    "address": "Av4dQxUK7nBfU4rSp9qfj3s8KEzT2crB9j15KXq7pump",
+    "chain": "Solana",
+    "dexscreener_url": "https://dexscreener.com/solana/bfsqwifutkeihvba8nwgcmpgrdtxrjgw4bw3r76fwynr",
+    "token_age_days": 0,
+    "first_seen": "Unknown"
+  },
+  "market_snapshot": {
+    "current_price": "$0.00005871",
+    "market_cap": "$58,707",
+    "liquidity_usd": "$28,601",
+    "volume_24h": "$2,748,567",
+    "liquidity_to_mcap_ratio": "48.7%",
+    "volume_to_mcap_ratio": "4681.8%"
+  },
+  "price_action_analysis": {
+    "24h_change": "-11.17%",
+    "6h_change": "-13.40%",
+    "1h_change": "-25.22%",
+    "5m_change": "-16.35%",
+    "trend_analysis": "Strong downtrend - Capitulation phase"
+  },
+  "trading_activity": {
+    "24h_transactions": {
+      "buys": 17706,
+      "sells": 15802,
+      "total": 33508,
+      "buy_sell_ratio": "1.12"
+    },
+    "trading_sentiment": "Neutral - Balanced trading"
+  },
+  "brs_analysis": {
+    "total_score": "71.0/100",
+    "category": "Showing Life",
+    "interpretation": "Add to watchlist - monitoring recommended",
+    "component_scores": {
+      "holder_resilience": {
+        "score": "15.0/20",
+        "percentage": "75%",
+        "key_metric": "Buy/Sell Ratio: 1.12"
+      },
+      "volume_floor": {
+        "score": "20.0/20",
+        "percentage": "100%",
+        "key_metric": "24h Volume: $2,748,567"
+      },
+      "price_recovery": {
+        "score": "5.0/20",
+        "percentage": "25%",
+        "key_metric": "Recent momentum: -25.2% (1h)"
+      },
+      "distribution_health": {
+        "score": "10.0/10",
+        "percentage": "100%",
+        "key_metric": "Liquidity ratio: 48.7%"
+      },
+      "revival_momentum": {
+        "score": "10.0/15",
+        "percentage": "67%",
+        "key_metric": "Volume trend: up"
+      },
+      "smart_accumulation": {
+        "score": "11.0/15",
+        "percentage": "73%",
+        "key_metric": "Accumulation pattern: Net accumulation"
+      }
+    }
+  },
+  "phoenix_validation": {
+    "meets_criteria": [
+      "\u26a0\ufe0f Moderate decline (<30% drop)",
+      "\u2705 Meets minimum volume requirement ($50k+)",
+      "\u2705 Good liquidity for entry/exit"
+    ],
+    "key_strengths": [
+      "\ud83d\udcca Exceptional volume relative to market cap",
+      "\ud83d\udca7 Deep liquidity pool",
+      "\ud83c\udfc6 High BRS score indicates strong phoenix potential"
+    ],
+    "risk_factors": [
+      "\u26a0\ufe0f Micro-cap - high volatility risk"
+    ],
+    "recovery_potential": "High (65/100) - Exceptional volume indicates high interest, Net buying pressure"
+  },
+  "investment_thesis": "OKCC presents a potential phoenix opportunity after dropping 11.2% in 24 hours. The token shows remarkable trading activity with $2,748,567 in 24h volume (4682% of market cap), indicating sustained interest despite the price decline. Buy/sell ratio of 1.12 suggests smart money accumulation at these levels. Liquidity of $28,601 (48.7% of market cap) provides adequate depth for position building. BRS analysis rates this as 'Showing Life' with score 71.0/100: Add to watchlist - monitoring recommended",
+  "technical_recommendation": {
+    "action": "BUY",
+    "position_size": "1-2% of portfolio",
+    "strategy": "Scale in gradually, monitor volume",
+    "risk_management": [
+      "Stop loss: -15% from entry (tighter due to low liquidity)",
+      "Target 1: +30% (partial exit)",
+      "Target 2: +60% (reduce position)",
+      "Target 3: +100%+ (final exit)"
+    ],
+    "time_horizon": "1-7 days for initial bounce, 2-4 weeks for full recovery"
+  }
+}

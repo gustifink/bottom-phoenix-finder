@@ -1,7 +1,7 @@
-// API Configuration - Use Vercel production API
+// API Configuration
 const API_URL = '/api';
 const API_BASE_URL = '';
-const WS_URL = location.protocol === 'https:' ? 'wss://' + location.host + '/ws/updates' : 'ws://' + location.host + '/ws/updates';
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/updates`;
 
 // State Management
 let phoenixTokens = [];
@@ -98,7 +98,7 @@ async function loadTopPhoenixes() {
             chain: 'solana'  // Always Solana
         });
         
-        const response = await fetch(`${API_URL}/top-phoenixes?${params}`);
+        const response = await fetch(`${API_BASE_URL}/api/top-phoenixes?${params}`);
         if (!response.ok) throw new Error('Failed to load tokens');
         
         let tokens = await response.json();
@@ -285,7 +285,7 @@ function showFeaturedPhoenix(token) {
 // Load Recent Alerts
 async function loadRecentAlerts() {
     try {
-        const response = await fetch(`${API_URL}/alerts/recent?limit=5`);
+        const response = await fetch(`${API_BASE_URL}/api/alerts/recent?limit=5`);
         if (!response.ok) throw new Error('Failed to load alerts');
         
         recentAlerts = await response.json();
@@ -505,7 +505,7 @@ function formatComponentName(key) {
 // Add to Watchlist
 async function addToWatchlist(address) {
     try {
-        const response = await fetch(`${API_URL}/watchlist/add`, {
+        const response = await fetch(`${API_BASE_URL}/api/watchlist/add`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -527,15 +527,8 @@ async function addToWatchlist(address) {
     }
 }
 
-// WebSocket Connection - Disabled in production, use polling instead
+// WebSocket Connection
 function connectWebSocket() {
-    // WebSockets not supported in Vercel serverless
-    // Use polling instead for production
-    if (location.hostname.includes('vercel.app') || location.hostname !== 'localhost') {
-        console.log('Production environment detected - using polling instead of WebSocket');
-        return;
-    }
-    
     ws = new WebSocket(WS_URL);
     
     ws.onopen = () => {
