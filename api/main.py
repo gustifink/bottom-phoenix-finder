@@ -307,5 +307,5 @@ async def get_top_phoenixes_endpoint(
         raise HTTPException(status_code=500, detail="Internal server error fetching token data.")
 
 # Vercel handler (standard for FastAPI on Vercel)
-def handler(request, response):
-    return app(request, response) 
+# def handler(request, response):
+#     return app(request, response) 
