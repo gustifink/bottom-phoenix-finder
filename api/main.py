@@ -61,20 +61,42 @@ async def fetch_live_tokens():
     tokens = []
     search_terms = ["BONK", "BOME", "WIF", "MEW", "POPCAT", "MYRO", "WEN", "SAMO"]
     
+    logger.info(f"Starting token fetch for {len(search_terms)} search terms")
+    
     async with httpx.AsyncClient() as client:
         for term in search_terms:
             try:
+                logger.info(f"Searching for: {term}")
                 response = await client.get(f"https://api.dexscreener.com/latest/dex/search?q={term}")
                 if response.status_code == 200:
                     data = response.json()
-                    for pair in data.get("pairs", [])[:3]:  # Top 3 per term
-                        if pair.get("chainId") == "solana" and pair.get("liquidity", {}).get("usd", 0) > 5000:
-                            token = process_dex_pair(pair)
-                            if token:
-                                tokens.append(token)
+                    pairs = data.get("pairs", [])
+                    logger.info(f"Found {len(pairs)} pairs for {term}")
+                    
+                    processed_count = 0
+                    for pair in pairs[:3]:  # Top 3 per term
+                        if pair.get("chainId") == "solana":
+                            liquidity_usd = pair.get("liquidity", {}).get("usd", 0)
+                            if liquidity_usd > 5000:
+                                token = process_dex_pair(pair)
+                                if token:
+                                    tokens.append(token)
+                                    processed_count += 1
+                                    logger.info(f"Added token: {token['symbol']} (BRS: {token['brs_score']})")
+                                else:
+                                    logger.warning(f"Failed to process pair for {term}")
+                            else:
+                                logger.info(f"Skipping {term} pair - liquidity too low: ${liquidity_usd:,.0f}")
+                        else:
+                            logger.info(f"Skipping non-Solana pair for {term}: {pair.get('chainId')}")
+                    
+                    logger.info(f"Successfully processed {processed_count} tokens for {term}")
+                else:
+                    logger.error(f"API error for {term}: {response.status_code}")
             except Exception as e:
                 logger.error(f"Error fetching data for {term}: {e}")
                 
+    logger.info(f"Total tokens collected: {len(tokens)}")
     return tokens[:20]  # Return top 20
 
 def process_dex_pair(pair):
@@ -82,30 +104,68 @@ def process_dex_pair(pair):
     try:
         base_token = pair.get("baseToken", {})
         
-        # Calculate mock metrics (in production, these would be real calculations)
-        current_price = float(pair.get("priceUsd", 0))
-        volume_24h = float(pair.get("volume", {}).get("h24", 0))
-        liquidity = float(pair.get("liquidity", {}).get("usd", 0))
-        market_cap = float(pair.get("marketCap", 0))
-        fdv = float(pair.get("fdv", market_cap))
-        price_change_24h = float(pair.get("priceChange", {}).get("h24", 0))
+        # Validate required fields
+        if not base_token.get("address") or not base_token.get("symbol"):
+            logger.warning(f"Skipping pair - missing address or symbol: {base_token}")
+            return None
         
-        # Mock BRS calculation (would be real algorithm in production)
-        brs_score = min(95, max(20, 
-            (liquidity / 100000) * 10 + 
-            abs(price_change_24h) * 2 + 
-            (volume_24h / market_cap * 100) * 5
-        ))
+        # Calculate metrics with proper defaults and validation
+        current_price = float(pair.get("priceUsd") or 0)
+        volume_24h = float(pair.get("volume", {}).get("h24") or 0)
+        liquidity = float(pair.get("liquidity", {}).get("usd") or 0)
+        market_cap = float(pair.get("marketCap") or 0)
+        fdv = float(pair.get("fdv") or market_cap or 0)
+        price_change_24h = float(pair.get("priceChange", {}).get("h24") or 0)
         
-        # Mock crash percentage
-        crash_percentage = min(90, max(65, 85 - (brs_score * 0.2)))
+        # Skip tokens with no meaningful data
+        if current_price <= 0 or liquidity <= 0:
+            logger.warning(f"Skipping token {base_token.get('symbol')} - no price or liquidity data")
+            return None
         
-        category = "Phoenix Rising" if brs_score > 75 else "Showing Life" if brs_score > 60 else "Deep Bottom"
+        # BRS calculation with safe division
+        brs_score = 30  # Base score
         
-        return {
+        # Liquidity component (0-25 points)
+        if liquidity > 0:
+            brs_score += min(25, (liquidity / 50000) * 25)
+        
+        # Price change component (0-20 points) 
+        brs_score += min(20, abs(price_change_24h) * 2)
+        
+        # Volume component (0-25 points)
+        if market_cap > 0 and volume_24h > 0:
+            volume_ratio = (volume_24h / market_cap) * 100
+            brs_score += min(25, volume_ratio * 5)
+        elif volume_24h > 100000:  # High absolute volume
+            brs_score += 15
+        
+        # Cap the score
+        brs_score = min(95, max(20, brs_score))
+        
+        # Mock crash percentage based on inverse BRS
+        crash_percentage = min(90, max(65, 90 - (brs_score * 0.3)))
+        
+        category = "Phoenix Rising" if brs_score > 70 else "Showing Life" if brs_score > 50 else "Deep Bottom"
+        
+        # Handle date parsing safely
+        pair_created = pair.get("pairCreatedAt")
+        token_age_days = 1
+        first_seen_date = datetime.utcnow().isoformat()
+        
+        if pair_created:
+            try:
+                if pair_created.endswith('Z'):
+                    pair_created = pair_created.replace('Z', '+00:00')
+                created_dt = datetime.fromisoformat(pair_created)
+                token_age_days = max(1, (datetime.utcnow() - created_dt.replace(tzinfo=None)).days)
+                first_seen_date = created_dt.isoformat()
+            except Exception as e:
+                logger.warning(f"Date parsing error for {base_token.get('symbol')}: {e}")
+        
+        token_data = {
             "address": base_token.get("address", ""),
             "symbol": base_token.get("symbol", ""),
-            "name": base_token.get("name", ""),
+            "name": base_token.get("name", base_token.get("symbol", "")),
             "chain": "solana",
             "current_price": current_price,
             "crash_percentage": crash_percentage,
@@ -127,11 +187,16 @@ def process_dex_pair(pair):
             "volume_trend": "up" if volume_24h > 100000 else "stable",
             "price_trend": "recovering" if price_change_24h > 0 else "stabilizing",
             "last_updated": datetime.utcnow().isoformat(),
-            "first_seen_date": pair.get("pairCreatedAt", datetime.utcnow().isoformat()),
-            "token_age_days": max(1, int((datetime.utcnow() - datetime.fromisoformat(pair.get("pairCreatedAt", datetime.utcnow().isoformat()).replace("Z", "+00:00"))).days))
+            "first_seen_date": first_seen_date,
+            "token_age_days": token_age_days
         }
+        
+        logger.info(f"Processed token: {token_data['symbol']} - BRS: {token_data['brs_score']}")
+        return token_data
+        
     except Exception as e:
         logger.error(f"Error processing pair: {e}")
+        logger.error(f"Pair data: {pair}")
         return None
 
 # API Endpoints
