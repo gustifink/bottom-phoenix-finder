@@ -3,12 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bottom - Phoenix Token Finder</title>
-    <meta http-equiv="refresh" content="0; url=/frontend/">
+    <title>Bottom - Solana Phoenix Token Finder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
-    <script>
-        window.location.href = '/frontend/';
-    </script>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🔥 Bottom</h1>
+                    <p class="tagline">Find Solana Phoenix Tokens Before They Rise</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="total-tracked">0</span>
+                        <span class="stat-label">Tokens Tracked</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="phoenixes-found">0</span>
+                        <span class="stat-label">Phoenixes Found</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="alerts-sent">0</span>
+                        <span class="stat-label">Alerts Sent</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Chain</label>
+                <select id="chain-filter" class="filter-select" disabled>
+                    <option value="solana" selected>Solana</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Min Score</label>
+                <select id="score-filter" class="filter-select">
+                    <option value="0">All Scores</option>
+                    <option value="60">60+ (Showing Life)</option>
+                    <option value="80">80+ (Phoenix Rising)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Min Market Cap</label>
+                <select id="marketcap-filter" class="filter-select">
+                    <option value="500000" selected>$500K+</option>
+                    <option value="1000000">$1M+</option>
+                    <option value="5000000">$5M+</option>
+                    <option value="10000000">$10M+</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Min Volume</label>
+                <select id="volume-filter" class="filter-select">
+                    <option value="50000" selected>$50K+</option>
+                    <option value="100000">$100K+</option>
+                    <option value="250000">$250K+</option>
+                    <option value="500000">$500K+</option>
+                </select>
+            </div>
+            <button id="refresh-btn" class="refresh-btn">
+                <i data-feather="refresh-cw"></i>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Featured Phoenix Card -->
+            <div id="featured-phoenix" class="featured-phoenix-container" style="display: none;">
+                <h2 class="section-title">🔥 Featured Phoenix Opportunity</h2>
+                <div class="featured-card">
+                    <!-- Featured card content will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Phoenix Tokens Table -->
+            <div class="phoenix-table-container">
+                <h2 class="section-title">Top Solana Phoenix Candidates</h2>
+                <div class="table-wrapper">
+                    <table class="phoenix-table">
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>BRS Score</th>
+                                <th>Price</th>
+                                <th>Market Cap</th>
+                                <th>24h Change</th>
+                                <th>Crash %</th>
+                                <th>Volume 24h</th>
+                                <th>Liquidity</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="phoenix-tbody">
+                            <!-- Token rows will be inserted here -->
+                        </tbody>
+                    </table>
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Scanning for Solana phoenixes...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="alerts-section">
+                <h2 class="section-title">Recent Phoenix Alerts</h2>
+                <div class="alerts-container" id="alerts-container">
+                    <!-- Alerts will be inserted here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Token Details Modal -->
+        <div id="tokenDetailsModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal()">×</button>
+                <div id="modalContent">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
 </body>
 </html> 
