@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/*.py",
+      "src": "api/main.py",
       "use": "@vercel/python"
     },
     {
@@ -20,16 +20,8 @@
   ],
   "routes": [
     {
-      "src": "/api/health",
-      "dest": "/api/health.py"
-    },
-    {
-      "src": "/api/top-phoenixes",
-      "dest": "/api/top-phoenixes.py"
-    },
-    {
-      "src": "/api",
-      "dest": "/api/index.py"
+      "src": "/api/(.*)",
+      "dest": "/api/main.py"
     },
     {
       "src": "/(.*\\.(css|js|html))",
