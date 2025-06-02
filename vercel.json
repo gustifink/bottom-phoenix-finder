@@ -1,21 +1,8 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "api/main.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.js",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -24,15 +11,8 @@
       "dest": "/api/main.py"
     },
     {
-      "src": "/(.*\\.(css|js|html))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/",
+      "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "PYTHONPATH": "/var/task"
-  }
+  ]
 } 
