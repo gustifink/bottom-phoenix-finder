@@ -297,14 +297,164 @@ async def get_top_phoenixes_endpoint(
     # Query parameters can be added here if needed, e.g., min_brs, min_liquidity
     limit: int = Query(20, ge=1, le=100)
 ):
-    logger.info(f"Top phoenixes endpoint called with limit: {limit}")
     try:
+        logger.info(f"API endpoint /api/top-phoenixes called with limit={limit}")
         tokens = await fetch_live_tokens()
-        logger.info(f"Fetched {len(tokens)} tokens before applying limit.")
         return tokens[:limit]
     except Exception as e:
-        logger.error(f"Error in /api/top-phoenixes endpoint: {e}", exc_info=True)
+        logger.error(f"Error getting top phoenixes: {e}")
         raise HTTPException(status_code=500, detail="Internal server error fetching token data.")
+
+# Add the missing endpoints that the frontend expects
+
+@app.get("/api/alerts/recent")
+async def get_recent_alerts(limit: int = Query(5, ge=1, le=20)):
+    """Get recent phoenix alerts - returning mock data for now"""
+    try:
+        # Mock alerts data - in a real implementation this would come from a database
+        mock_alerts = [
+            {
+                "id": 1,
+                "message": "Phoenix detected: WIF showing 15% recovery",
+                "token_address": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+                "timestamp": datetime.now().isoformat(),
+                "type": "phoenix_detected"
+            },
+            {
+                "id": 2,
+                "message": "Strong buy signal: BONK volume surge 300%",
+                "token_address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+                "type": "volume_surge"
+            }
+        ]
+        return mock_alerts[:limit]
+    except Exception as e:
+        logger.error(f"Error getting recent alerts: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error fetching alerts.")
+
+@app.get("/api/token/{address}/analysis")
+async def get_token_analysis(address: str):
+    """Get detailed token analysis - generating mock data for now"""
+    try:
+        logger.info(f"Token analysis requested for address: {address}")
+        
+        # In a real implementation, you would fetch this data from your database
+        # and/or make additional API calls to get historical data
+        mock_analysis = {
+            "token_info": {
+                "address": address,
+                "symbol": "MOCK",
+                "name": "Mock Token",
+                "token_age_days": 45,
+                "first_seen": (datetime.now() - timedelta(days=45)).isoformat(),
+                "dexscreener_url": f"https://dexscreener.com/solana/{address}"
+            },
+            "market_metrics": {
+                "current_price": 0.000123,
+                "market_cap": 1250000,
+                "liquidity_usd": 89000,
+                "volume_24h": 340000,
+                "liquidity_to_mcap_ratio": 7.1
+            },
+            "phoenix_indicators": {
+                "crash_from_ath": -73.5,
+                "price_change_24h": 12.3,
+                "price_change_6h": 8.7,
+                "price_change_1h": 2.1,
+                "buy_sell_ratio": 1.4,
+                "buys_24h": 234,
+                "sells_24h": 167
+            },
+            "brs_analysis": {
+                "total_score": 74.2,
+                "category": "Strong Phoenix",
+                "interpretation": "High recovery potential with strong fundamentals",
+                "score_breakdown": {
+                    "holder_resilience": {
+                        "score": 18,
+                        "max_score": 23,
+                        "percentage": 78.3,
+                        "explanation": "Strong holder base showing resilience during market downturns"
+                    },
+                    "volume_floor": {
+                        "score": 19,
+                        "max_score": 24,
+                        "percentage": 79.2,
+                        "explanation": "Volume holding steady above critical support levels"
+                    },
+                    "price_recovery": {
+                        "score": 16,
+                        "max_score": 22,
+                        "percentage": 72.7,
+                        "explanation": "Recent price action showing signs of bottom formation"
+                    },
+                    "distribution_health": {
+                        "score": 8,
+                        "max_score": 11,
+                        "percentage": 72.7,
+                        "explanation": "Token distribution appears healthy with no major concentration risks"
+                    },
+                    "revival_momentum": {
+                        "score": 10,
+                        "max_score": 13,
+                        "percentage": 76.9,
+                        "explanation": "Building momentum with increasing buyer interest"
+                    },
+                    "smart_accumulation": {
+                        "score": 11,
+                        "max_score": 15,
+                        "percentage": 73.3,
+                        "explanation": "Smart money appears to be accumulating positions"
+                    }
+                }
+            },
+            "large_transactions": {
+                "total_count": 12,
+                "total_volume": 45000,
+                "transactions": [
+                    {
+                        "type": "buy",
+                        "usd_amount": 8500,
+                        "token_amount": 69105691,
+                        "wallet": "7x...4kP",
+                        "timestamp": (datetime.now() - timedelta(hours=3)).isoformat()
+                    },
+                    {
+                        "type": "buy",
+                        "usd_amount": 5200,
+                        "token_amount": 42276423,
+                        "wallet": "9m...2vL",
+                        "timestamp": (datetime.now() - timedelta(hours=8)).isoformat()
+                    },
+                    {
+                        "type": "buy",
+                        "usd_amount": 3800,
+                        "token_amount": 30894309,
+                        "wallet": "4n...8rT",
+                        "timestamp": (datetime.now() - timedelta(hours=12)).isoformat()
+                    }
+                ]
+            },
+            "selection_reasons": [
+                "Token has crashed 73.5% from ATH but shows strong recovery signs",
+                "High BRS score of 74.2 indicates strong phoenix potential",
+                "Recent volume surge suggests renewed interest",
+                "Large wallet accumulation detected in past 24 hours"
+            ],
+            "risk_factors": [
+                "Still early in recovery phase - volatility expected",
+                "Market cap relatively small - higher risk/reward ratio",
+                "Token age is moderate - watch for long-term viability",
+                "General crypto market conditions affect all tokens"
+            ]
+        }
+        
+        return mock_analysis
+        
+    except Exception as e:
+        logger.error(f"Error getting token analysis for {address}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error fetching token analysis.")
 
 # Vercel handler (standard for FastAPI on Vercel)
 # def handler(request, response):
